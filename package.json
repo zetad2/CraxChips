@@ -1,17 +1,20 @@
 {
-  "name": "my-app",
+  "name": "crax-chips",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 5162",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 5162",
     "lint": "eslint"
   },
   "dependencies": {
+    "@types/three": "^0.187.0",
+    "lucide-react": "^1.66.0",
     "next": "16.4.3",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
