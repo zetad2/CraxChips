@@ -15,7 +15,12 @@ export const metadata: Metadata = {
     "Snack vanille fromage épicé",
   ],
   icons: {
-    icon: "/assets/crax_logo.png",
+    icon: [
+      { url: "/assets/crax_logo_hq.png" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/assets/crax_logo_hq.png",
+    apple: "/assets/crax_logo_hq.png",
   },
 };
 
