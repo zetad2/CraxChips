@@ -1,5 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   color-scheme: light;
@@ -7,51 +9,108 @@
   --foreground: #0f2744;
 }
 
+.dark {
+  color-scheme: dark;
+  --background: #070e1c;
+  --foreground: #f1f5f9;
+}
+
 html {
   scroll-behavior: smooth;
-  font-family: 'Outfit', sans-serif;
-  color-scheme: light !important;
+  font-family: "Outfit", sans-serif;
+  transition: background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1), color 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {
-  background: #ffffff;
-  color: #0f2744;
+  background: var(--background);
+  color: var(--foreground);
   overflow-x: hidden;
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
+  transition: background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1), color 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Force light theme always for joyful snack branding */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #ffffff;
-    --foreground: #0f2744;
-  }
-  body {
-    background: #ffffff;
-    color: #0f2744;
-  }
+h1,
+h2,
+h3,
+.font-heading {
+  font-family: "Fredoka", "Outfit", sans-serif;
 }
 
-h1, h2, h3, .font-heading {
-  font-family: 'Fredoka', 'Outfit', sans-serif;
-}
-
-/* 3D Cartoon Text Styling for CORN TOON */
-.text-3d-corntoon {
-  font-family: 'Fredoka', sans-serif;
+/* Ultra-Striking 3D Cartoon Text Styling for CORN (Yellow with Multi-layer Red 3D Extrusion) */
+.text-3d-corn {
+  font-family: "Fredoka", "Outfit", sans-serif;
   font-weight: 900;
-  color: #ffd000;
-  background: linear-gradient(180deg, #ffe259 0%, #ffa751 55%, #ff6a00 100%);
+  display: inline-block;
+  color: #ffe600;
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #fff766 20%,
+    #ffd000 55%,
+    #ff9600 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 4px #ffffff;
-  filter: drop-shadow(0px 8px 0px #b85000) drop-shadow(0px 14px 18px rgba(184, 80, 0, 0.45));
+  -webkit-text-stroke: 5px #ffffff;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 2px 0 #db1a1a) drop-shadow(0 4px 0 #c71414)
+    drop-shadow(0 6px 0 #b30e0e) drop-shadow(0 8px 0 #9e0909)
+    drop-shadow(0 10px 0 #8a0505) drop-shadow(0 12px 0 #730000)
+    drop-shadow(0 15px 3px rgba(0, 0, 0, 0.35))
+    drop-shadow(0 22px 28px rgba(199, 20, 20, 0.55));
+  transform: perspective(600px) rotateX(6deg) rotateY(-4deg);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.2s ease-out,
+    filter 0.2s ease-out;
+}
+
+/* Ultra-Striking 3D Cartoon Text Styling for TOON (Vibrant Red with Multi-layer Dark Crimson 3D Extrusion) */
+.text-3d-toon {
+  font-family: "Fredoka", "Outfit", sans-serif;
+  font-weight: 900;
+  display: inline-block;
+  color: #ff2a2a;
+  background: linear-gradient(
+    180deg,
+    #ffb3b3 0%,
+    #ff3b3b 25%,
+    #e60000 65%,
+    #9e0000 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 5px #ffffff;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 2px 0 #7a0000) drop-shadow(0 4px 0 #6b0000)
+    drop-shadow(0 6px 0 #5c0000) drop-shadow(0 8px 0 #4d0000)
+    drop-shadow(0 10px 0 #3e0000) drop-shadow(0 12px 0 #2b0000)
+    drop-shadow(0 15px 3px rgba(0, 0, 0, 0.4))
+    drop-shadow(0 22px 28px rgba(122, 0, 0, 0.65));
+  transform: perspective(600px) rotateX(6deg) rotateY(-4deg);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.2s ease-out,
+    filter 0.2s ease-out;
 }
 
 @media (max-width: 640px) {
-  .text-3d-corntoon {
-    -webkit-text-stroke: 2.5px #ffffff;
-    filter: drop-shadow(0px 5px 0px #b85000) drop-shadow(0px 8px 12px rgba(184, 80, 0, 0.4));
+  .text-3d-corn {
+    -webkit-text-stroke: 3px #ffffff;
+    filter: drop-shadow(0 2px 0 #db1a1a) drop-shadow(0 4px 0 #b30e0e)
+      drop-shadow(0 6px 0 #8a0505)
+      drop-shadow(0 10px 15px rgba(199, 20, 20, 0.45));
+    transform: perspective(600px) rotateX(4deg) rotateY(-2deg);
+  }
+  .text-3d-toon {
+    -webkit-text-stroke: 3px #ffffff;
+    filter: drop-shadow(0 2px 0 #7a0000) drop-shadow(0 4px 0 #5c0000)
+      drop-shadow(0 6px 0 #3e0000) drop-shadow(0 10px 15px rgba(122, 0, 0, 0.5));
+    transform: perspective(600px) rotateX(4deg) rotateY(-2deg);
   }
 }
 

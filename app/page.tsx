@@ -1,40 +1,37 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import FlavorsSection from '@/components/FlavorsSection';
 import AboutSection from '@/components/AboutSection';
 import Footer from '@/components/Footer';
-import { FlavorType } from '@/components/CraxBag3D';
+import ScrollChipsAnimation from '@/components/ScrollChipsAnimation';
 
 export default function Home() {
-  const [currentFlavor, setCurrentFlavor] = useState<FlavorType>('vanilla');
-
   return (
-    <div className="min-h-screen flex flex-col bg-white text-[#0F2744] selection:bg-[#0072EC] selection:text-white">
-      {/* Header Navigation */}
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#070e1c] text-[#0F2744] dark:text-slate-100 selection:bg-[#0072EC] selection:text-white transition-colors duration-300">
+      {/* Header Navigation with exact Crax Logo & pill bar */}
       <Navbar />
 
       {/* Main Content */}
-      <main className="flex-1">
-        {/* Interactive 3D Hero Section */}
-        <HeroSection
-          currentFlavor={currentFlavor}
-          onSelectFlavor={setCurrentFlavor}
-        />
+      <main className="flex-1 relative">
+        {/* 3D Flying Multiplying Chips scroll animation between Hero and AboutSection */}
+        <ScrollChipsAnimation />
 
-        {/* 3 Flavors Presentation + Pourquoi Choisir */}
-        <FlavorsSection
-          currentFlavor={currentFlavor}
-          onSelectFlavor={setCurrentFlavor}
-        />
+        {/* Hero Section: Sticky at top: 0, z-0 */}
+        <div id="hero-scroll-track" className="sticky top-0 h-screen w-full z-0 overflow-hidden">
+          <HeroSection />
+        </div>
 
-        {/* About Brand & Story (EMCI Abidjan) */}
-        <AboutSection />
+        {/* Section 2 (AboutSection) and following sections: z-10, immediately sliding OVER Hero on scroll to mask it */}
+        <div className="relative z-10 bg-white dark:bg-[#070e1c] shadow-[0_-30px_70px_rgba(0,0,0,0.35)] transition-colors duration-700">
+          <AboutSection />
+          <FlavorsSection />
+        </div>
       </main>
 
-      {/* Footer */}
+      {/* Footer with exact ocean blue wave and contact details */}
       <Footer />
     </div>
   );

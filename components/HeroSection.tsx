@@ -1,276 +1,379 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
-import CraxBag3D, { FlavorType } from './CraxBag3D';
+import React, { useRef, useState, useEffect } from "react";
+import Image from "next/image";
 import {
   ArrowRight,
   ShieldCheck,
   Leaf,
   Smile,
   Star,
-  Sparkles,
-} from 'lucide-react';
+  Sun,
+  Moon,
+} from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 
-interface HeroSectionProps {
-  currentFlavor: FlavorType;
-  onSelectFlavor: (flavor: FlavorType) => void;
-}
+export default function HeroSection() {
+  const containerRef = useRef<HTMLElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const { theme, toggleTheme } = useTheme();
 
-const FLAVOR_DATA: Record<
-  FlavorType,
-  {
-    subtitle: string;
-    desc: string;
-    pillBg: string;
-    pillBorder: string;
-    textColor: string;
-  }
-> = {
-  vanilla: {
-    subtitle: 'NONO Ni Vanilla',
-    desc: 'Le croustillant aérien du maïs soufflé associé à la douceur gourmande de la vanille qui fait sourire petits et grands !',
-    pillBg: 'bg-[#0084FF]',
-    pillBorder: 'border-blue-400',
-    textColor: 'text-[#0072EC]',
-  },
-  cheese: {
-    subtitle: 'NONO Ni Fromage',
-    desc: 'Une explosion gourmande de vrai fromage cheddar fondant sur des chips soufflées ultra croustillantes !',
-    pillBg: 'bg-[#DC2626]',
-    pillBorder: 'border-red-400',
-    textColor: 'text-[#DC2626]',
-  },
-  spicy: {
-    subtitle: 'NONO Ni Épicé',
-    desc: 'Le peps pimenté irrésistible avec un mélange d’épices doux qui réveille le goût sans brûler le palais !',
-    pillBg: 'bg-[#16A34A]',
-    pillBorder: 'border-emerald-400',
-    textColor: 'text-[#16A34A]',
-  },
-};
+  // Smooth 3D mouse tilt tracking for the entire hero showcase
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - (rect.left + rect.width / 2);
+      const y = e.clientY - (rect.top + rect.height / 2);
+      setRotateY(Math.max(-12, Math.min(12, x / 40)));
+      setRotateX(Math.max(-10, Math.min(10, -y / 40)));
+    };
 
-export default function HeroSection({
-  currentFlavor,
-  onSelectFlavor,
-}: HeroSectionProps) {
-  const flavor = FLAVOR_DATA[currentFlavor];
+    const handleMouseLeave = () => {
+      setRotateX(0);
+      setRotateY(0);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseleave", handleMouseLeave);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []);
 
   return (
     <section
+      ref={containerRef}
       id="accueil"
-      className="relative min-h-screen pt-28 pb-16 px-4 sm:px-6 lg:px-12 flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#2B98EE] via-[#7AC4FB] via-50% to-[#FFFFFF]"
+      className="relative h-screen min-h-screen pt-24 sm:pt-28 pb-4 sm:pb-6 px-4 sm:px-6 lg:px-12 flex flex-col justify-between overflow-hidden bg-cover bg-center bg-no-repeat transition-colors duration-700"
+      style={{
+        backgroundImage: "url('/assets/hero_bg.png')",
+        backgroundPosition: "center top",
+      }}
     >
-      {/* Tropical Green Leaves in Corners (matching ChatGPT mockup 1) */}
-      <div className="absolute top-0 left-0 w-36 sm:w-56 h-48 sm:h-72 pointer-events-none z-10 opacity-95">
-        <Image
-          src="/assets/leaves_left.png"
-          alt="Feuilles tropicales"
-          fill
-          className="object-contain object-top-left"
-          priority
-        />
-      </div>
-      <div className="absolute top-0 right-0 w-40 sm:w-64 h-56 sm:h-80 pointer-events-none z-10 opacity-95">
-        <Image
-          src="/assets/leaves_right.png"
-          alt="Feuilles tropicales"
-          fill
-          className="object-contain object-top-right"
-          priority
-        />
-      </div>
+      {/* Dark mode cinematic night overlay with glowing ambient stars/aurora */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#060d1b]/88 via-[#08142c]/82 to-[#070e1c] pointer-events-none transition-opacity duration-700 opacity-0 dark:opacity-100 z-0" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(0,114,236,0.35),transparent)] pointer-events-none transition-opacity duration-700 opacity-0 dark:opacity-100 z-0" />
 
-      {/* Radiant Sun Glow behind product */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[800px] h-[700px] bg-gradient-to-b from-white/60 via-amber-100/30 to-transparent rounded-full blur-3xl pointer-events-none" />
+      {/* Theme Toggle Button Widget - Seamlessly integrated in Hero Section */}
+      <div className="absolute top-24 sm:top-28 right-4 sm:right-8 lg:right-12 z-40">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={
+            theme === "dark" ? "Basculer en mode jour" : "Basculer en mode nuit"
+          }
+          title={
+            theme === "dark"
+              ? "Mode Nuit actif (cliquer pour le mode Jour)"
+              : "Mode Jour actif (cliquer pour le mode Nuit)"
+          }
+          className="group relative flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-2 border-white/80 dark:border-slate-700/80 shadow-[0_8px_30px_rgba(0,114,236,0.18)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)] hover:shadow-blue-500/35 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer select-none"
+        >
+          {/* Micro Track with Sun & Moon */}
+          <div className="relative w-12 h-6 sm:w-14 sm:h-7 rounded-full bg-sky-100 dark:bg-slate-800 p-0.5 flex items-center justify-between px-1.5 border border-sky-200/80 dark:border-slate-700 shadow-inner">
+            <Sun
+              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all duration-300 ${
+                theme === "dark"
+                  ? "text-slate-500 opacity-40 scale-75"
+                  : "text-amber-500 opacity-100 scale-100"
+              }`}
+            />
+            <Moon
+              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-all duration-300 ${
+                theme === "dark"
+                  ? "text-sky-300 opacity-100 scale-100"
+                  : "text-slate-400 opacity-40 scale-75"
+              }`}
+            />
 
-      {/* Floating Puffed Corn Chips */}
-      <div className="absolute top-28 left-[18%] w-14 h-14 animate-bounce duration-[6000ms] opacity-90 hidden lg:block pointer-events-none drop-shadow-lg">
-        <Image src="/assets/puff_chip.png" alt="Puff Chip" width={56} height={56} className="rotate-12" />
-      </div>
-      <div className="absolute top-48 right-[14%] w-16 h-16 animate-bounce duration-[7000ms] delay-1000 opacity-90 hidden lg:block pointer-events-none drop-shadow-lg">
-        <Image src="/assets/puff_chip_2.png" alt="Puff Chip" width={64} height={64} className="-rotate-45" />
-      </div>
-
-      {/* Main Hero Content Grid */}
-      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-center z-20 my-auto">
-        
-        {/* Left Column: Big 3D Typography & CTA */}
-        <div className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left pt-6 lg:pt-0">
-          
-          {/* Flavor Pill Badge (matching mockup) */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-white shadow-md mb-2 transform hover:scale-105 transition-transform">
-            <span className={`w-2.5 h-2.5 rounded-full ${flavor.pillBg} animate-ping`} />
-            <span className={`font-black text-xs uppercase tracking-wider ${flavor.textColor}`}>
-              {flavor.subtitle}
+            {/* Sliding Pill Thumb */}
+            <span
+              className={`absolute top-0.5 w-5 h-5 sm:w-6 sm:h-6 rounded-full shadow-md transition-all duration-300 ease-out flex items-center justify-center ${
+                theme === "dark"
+                  ? "left-[calc(100%-1.45rem)] sm:left-[calc(100%-1.65rem)] bg-gradient-to-tr from-[#0072EC] to-indigo-500 text-white shadow-blue-500/50"
+                  : "left-0.5 bg-gradient-to-tr from-amber-400 to-yellow-300 text-amber-950 shadow-amber-500/30"
+              }`}
+            >
+              {theme === "dark" ? (
+                <Moon className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
+              ) : (
+                <Sun className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
+              )}
             </span>
           </div>
 
-          {/* 3D Giant Cartoon Bubbly Title (CORN TOON) matching mockup */}
-          <div className="relative my-1 select-none">
-            <h1 className="text-3d-corntoon text-6xl sm:text-7xl md:text-8xl lg:text-[100px] leading-[0.9] tracking-tight">
+          {/* Integrated Label with Badge indicator */}
+          <div className="flex flex-col text-left">
+            <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#0072EC] dark:text-sky-400 leading-none">
+              Ambiance
+            </span>
+            <span className="text-xs sm:text-sm font-black text-slate-800 dark:text-white leading-tight flex items-center gap-1">
+              <span>{theme === "dark" ? "Mode Nuit" : "Mode Jour"}</span>
+              <span className="pl-4 text-[11px] transition-transform duration-300 group-hover:rotate-12">
+                {theme === "dark" ? "🌙" : "☀️"}
+              </span>
+            </span>
+          </div>
+        </button>
+      </div>
+
+      {/* Soft gradient wash at bottom to blend seamlessly into white / dark theme */}
+      <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-[#070e1c] dark:via-[#070e1c]/85 pointer-events-none z-10 transition-colors duration-500" />
+
+      {/* Floating 3D Chips from mockup - First chip anchor for 3D scroll animation */}
+      <div
+        id="hero-first-chip"
+        className="absolute top-36 left-[7%] w-16 sm:w-20 aspect-square z-20 pointer-events-none drop-shadow-2xl transition-transform duration-300 opacity-0"
+        style={{
+          transform: `translate3d(${rotateY * -2}px, ${rotateX * -2}px, 40px) rotate(14deg)`,
+        }}
+      >
+        <Image
+          src="/assets/chip_single.png"
+          alt="Chip 3D maïs soufflé"
+          fill
+          sizes="80px"
+          className="object-contain"
+        />
+      </div>
+
+      <div
+        className="absolute top-52 right-[6%] w-14 sm:w-18 aspect-square z-20 pointer-events-none drop-shadow-2xl transition-transform duration-300"
+        style={{
+          transform: `translate3d(${rotateY * 2.5}px, ${rotateX * 2.5}px, 60px) rotate(-35deg)`,
+        }}
+      >
+        <Image
+          src="/assets/chip_single.png"
+          alt="Chip 3D maïs soufflé"
+          fill
+          sizes="72px"
+          className="object-contain"
+        />
+      </div>
+
+      {/* Main Hero Content Grid */}
+      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-20 my-auto">
+        {/* Left Column: Big Ultra-3D Typography & CTA */}
+        <div className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left pt-6 lg:pt-0">
+          {/* Top Yellow Rays above NONO Ni Vanilla */}
+          <div className="flex items-center gap-1.5 mb-2 ml-0 lg:ml-6">
+            <span className="w-1.5 h-3 bg-[#FFCC00] rounded-full -rotate-30 transform shadow-sm" />
+            <span className="w-1.5 h-4.5 bg-[#FFCC00] rounded-full transform shadow-sm" />
+            <span className="w-1.5 h-3 bg-[#FFCC00] rounded-full rotate-30 transform shadow-sm" />
+          </div>
+
+          {/* Flavor Pill Badge: NONO Ni Vanilla (Exact Match Mockup 1) */}
+          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-[#0072EC] text-white shadow-lg shadow-blue-500/30 mb-3 border border-white/50 transform hover:scale-105 transition-transform">
+            <span className="font-black text-sm uppercase tracking-wider">
+              NONO Ni Vanilla
+            </span>
+          </div>
+
+          {/* 3D Giant Cartoon Pop-Out Title (CORN TOON: Super 3D Jumps off the screen) */}
+          <div
+            className="relative my-2 select-none transition-transform duration-200 ease-out"
+            style={{
+              perspective: "1000px",
+              transform: `perspective(1000px) rotateX(${rotateX * 0.4}deg) rotateY(${rotateY * 0.4}deg) scale(1.02)`,
+            }}
+          >
+            <h1 className="text-3d-corn text-6xl sm:text-7xl md:text-8xl lg:text-[110px] leading-[0.88] tracking-tight hover:scale-105 transition-transform">
               CORN
             </h1>
-            <h1 className="text-3d-corntoon text-6xl sm:text-7xl md:text-8xl lg:text-[100px] leading-[0.9] tracking-tight -mt-1 sm:-mt-2">
+            <br />
+            <h1 className="text-3d-toon text-6xl sm:text-7xl md:text-8xl lg:text-[110px] leading-[0.88] tracking-tight -mt-3 sm:-mt-5 hover:scale-105 transition-transform">
               TOON
             </h1>
           </div>
 
           {/* Slogan */}
-          <h2 className="text-2xl sm:text-3xl font-black text-[#0B3B70] mt-4 tracking-tight drop-shadow-sm">
+          <h2 className="bg-[#0054f1] text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mt-4 tracking-tight drop-shadow-sm italic">
             Le goût unique qui fait sourire !
           </h2>
 
-          {/* Description */}
-          <p className="text-slate-700 text-base sm:text-lg mt-3 max-w-lg leading-relaxed font-semibold">
-            {flavor.desc}
-          </p>
-
-          {/* Action Buttons */}
-          <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-4">
+          {/* CTA Button: Découvrir le produit -> */}
+          <div className="mt-8">
             <a
               href="#saveurs"
-              className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-[#0072EC] via-[#1A90FF] to-[#0072EC] text-white font-black text-base shadow-xl shadow-blue-500/35 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all duration-300 border-2 border-white/60"
+              className="group inline-flex items-center gap-4 px-8 py-4 rounded-full bg-gradient-to-r from-[#0072EC] via-[#1A90FF] to-[#0072EC] text-white font-black text-base sm:text-lg shadow-xl shadow-blue-500/35 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all duration-300 border-2 border-white/60 active:scale-95"
             >
               <span>Découvrir le produit</span>
-              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1.5" />
+              <div className="w-8 h-8 rounded-full bg-white text-[#0072EC] flex items-center justify-center transition-transform group-hover:translate-x-1 shadow-md">
+                <ArrowRight className="w-4 h-4 stroke-[3]" />
+              </div>
             </a>
-
-            <a
-              href="#a-propos"
-              className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-white/95 hover:bg-white text-slate-800 font-extrabold text-base shadow-md hover:shadow-lg border border-sky-100 hover:-translate-y-0.5 transition-all"
-            >
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Notre Histoire</span>
-            </a>
-          </div>
-
-          {/* Interactive Flavor Switcher Tabs */}
-          <div className="mt-8 w-full max-w-md">
-            <p className="text-xs font-black uppercase tracking-wider text-slate-600 mb-2">
-              Choisissez votre saveur Crax :
-            </p>
-            <div className="grid grid-cols-3 gap-2 p-1.5 rounded-2xl bg-white/80 backdrop-blur-md border border-white shadow-lg">
-              {(['vanilla', 'cheese', 'spicy'] as FlavorType[]).map((flv) => {
-                const isActive = currentFlavor === flv;
-                const labels: Record<FlavorType, { name: string; emoji: string; color: string }> = {
-                  vanilla: { name: 'Vanille', emoji: '🍦', color: 'from-[#0072EC] to-[#38BDF8]' },
-                  cheese: { name: 'Fromage', emoji: '🧀', color: 'from-[#DC2626] to-[#F59E0B]' },
-                  spicy: { name: 'Épicé', emoji: '🌶️', color: 'from-[#16A34A] to-[#84CC16]' },
-                };
-                return (
-                  <button
-                    key={flv}
-                    onClick={() => onSelectFlavor(flv)}
-                    className={`py-2.5 px-2 rounded-xl font-black text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1.5 transition-all duration-300 ${
-                      isActive
-                        ? `bg-gradient-to-r ${labels[flv].color} text-white shadow-md scale-105`
-                        : 'text-slate-700 hover:bg-white/90'
-                    }`}
-                  >
-                    <span>{labels[flv].emoji}</span>
-                    <span>{labels[flv].name}</span>
-                  </button>
-                );
-              })}
-            </div>
           </div>
         </div>
 
-        {/* Right Column: 3D Scene with Podium, Gold Badge, and Snack Bowl */}
-        <div className="lg:col-span-7 relative flex items-center justify-center">
-          
-          {/* Gold Quality Seal Badge (From mockup 1) */}
-          <div className="absolute top-2 sm:top-6 right-2 sm:right-6 z-30 w-24 sm:w-32 h-24 sm:h-32 drop-shadow-2xl transform hover:scale-105 transition-transform">
-            <Image
-              src="/assets/gold_badge.png"
-              alt="Qualité Supérieure 5 étoiles"
-              fill
-              className="object-contain"
-            />
-          </div>
+        {/* Right Column: Pure 3D Showcase (100% Clean, No white artifacts, Pop-Out Depth) */}
+        <div
+          className="lg:col-span-7 relative flex items-center justify-center py-6 select-none"
+          style={{ perspective: "1200px" }}
+        >
+          {/* Main 3D Container with Parallax Perspective */}
+          <div
+            className="relative w-full max-w-[620px] aspect-[4/3] flex items-center justify-center transition-transform duration-200 ease-out"
+            style={{
+              transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`,
+              transformStyle: "preserve-3d",
+            }}
+          >
+            {/* 3D Tiered Circular Podium Platform */}
+            <div className="absolute bottom-2 w-[85%] h-24 rounded-[100%] bg-gradient-to-b from-white via-sky-100 to-sky-200 dark:from-slate-800 dark:via-blue-950 dark:to-slate-900 border-4 border-white dark:border-blue-500/40 shadow-[0_20px_50px_rgba(0,114,236,0.35)] dark:shadow-[0_20px_50px_rgba(0,114,236,0.5)] -z-10 transform scale-y-50 transition-colors duration-500">
+              <div className="absolute inset-2 rounded-[100%] bg-gradient-to-b from-sky-50 to-white/90 dark:from-slate-850 dark:to-slate-900/90" />
+            </div>
 
-          {/* 3D WebGL Canvas */}
-          <div className="w-full relative">
-            <CraxBag3D currentFlavor={currentFlavor} />
-          </div>
+            {/* Central 3D Crax Chips Corn Toon Bag (Ultra Clean PNG, zero artifacts) */}
+            <div
+              className="relative w-[340px] sm:w-[410px] aspect-square transition-transform duration-300 z-10"
+              style={{
+                transform: "translateZ(40px)",
+              }}
+            >
+              <Image
+                src="/assets/Composition publicitaire colorée de chips Crax.png"
+                alt="Paquet 3D Crax Chips Corn Toon Vanilla"
+                fill
+                sizes="(max-width: 1024px) 100vw, 420px"
+                className="object-contain drop-shadow-[0_25px_40px_rgba(0,90,210,0.4)]"
+                priority
+              />
+            </div>
 
-          {/* Blue Bowl of Chips on Podium (from mockup right) */}
-          <div className="absolute -bottom-2 right-2 sm:right-8 w-32 h-32 sm:w-44 sm:h-44 z-20 pointer-events-none drop-shadow-2xl">
-            <Image
-              src="/assets/blue_bowl_clean.png"
-              alt="Bol de chips Crax Corn Toon"
-              fill
-              className="object-contain"
-            />
+            {/* Top-Right: 3D Floating Gold Ribbon Seal Medal (Qualité Supérieure) */}
+            <div
+              className="absolute top-2 sm:top-6 right-2 sm:right-6 w-28 sm:w-36 aspect-square z-30 transition-transform duration-300 hover:scale-110 drop-shadow-[0_15px_30px_rgba(217,119,6,0.45)] animate-bounce duration-[8000ms]"
+              style={{
+                transform: "translateZ(90px) rotate(8deg)",
+              }}
+            >
+              <Image
+                src="/assets/gold_badge.png"
+                alt="Médaille d'Or Qualité Supérieure 5 étoiles"
+                fill
+                sizes="144px"
+                className="object-contain"
+                priority
+              />
+            </div>
+
+            {/* Bottom-Right: Royal Blue Ceramic Bowl overflowing with chips */}
+            {/* <div
+              className="absolute -bottom-2 sm:-bottom-4 right-0 sm:right-4 w-36 sm:w-48 aspect-square z-25 transition-transform duration-300 drop-shadow-[0_20px_35px_rgba(0,114,236,0.45)] hover:scale-105"
+              style={{
+                transform: "translateZ(70px)",
+              }}
+            >
+              <Image
+                src="/assets/blue_bowl_clean.png"
+                alt="Bol de chips Crax Corn Toon avec logo"
+                fill
+                sizes="192px"
+                className="object-contain"
+                priority
+              />
+            </div> */}
+
+            {/* Foreground Pop-Out Floating Chips with Deep Z-Index */}
+            <div
+              className="absolute bottom-6 left-6 sm:left-12 w-20 sm:w-28 aspect-square z-35 transition-transform duration-300 drop-shadow-[0_15px_25px_rgba(0,0,0,0.25)] pointer-events-none"
+              style={{
+                transform: `translate3d(${rotateY * -3}px, ${rotateX * -3}px, 120px) rotate(-16deg)`,
+              }}
+            >
+              <Image
+                src="/assets/chips_cluster.png"
+                alt="Chips 3D maïs soufflé"
+                fill
+                sizes="112px"
+                className="object-contain"
+              />
+            </div>
+
+            <div
+              className="absolute bottom-16 right-36 w-14 sm:w-16 aspect-square z-35 transition-transform duration-300 drop-shadow-xl pointer-events-none"
+              style={{
+                transform: `translate3d(${rotateY * 3}px, ${rotateX * 3}px, 100px) rotate(24deg)`,
+              }}
+            >
+              <Image
+                src="/assets/chip_single.png"
+                alt="Puff chip trèfle"
+                fill
+                sizes="64px"
+                className="object-contain"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom 4 Feature Trust Pills (From mockup 1) */}
+      {/* Bottom 4 Feature Trust Pills (Exact single elongated capsule matching Mockup 1) */}
       <div className="max-w-7xl mx-auto w-full z-20 mt-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          
+        <div className="bg-white/95 dark:bg-[#0b162c]/90 backdrop-blur-md rounded-2xl sm:rounded-full border border-sky-100 dark:border-slate-800 shadow-[0_12px_36px_rgba(0,114,236,0.12)] dark:shadow-[0_12px_36px_rgba(0,0,0,0.5)] p-2 sm:p-3 px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-sky-100 dark:divide-slate-800 transition-colors duration-300">
           {/* 1. Goût Délicieux */}
-          <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-white/80 shadow-[0_8px_20px_rgba(0,114,236,0.12)] hover:shadow-lg transition-all duration-300 group">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-sky-100 text-[#0072EC] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="flex items-center gap-3.5 py-3 sm:py-2 px-3 sm:px-4 group hover:bg-sky-50/50 dark:hover:bg-slate-800/60 rounded-2xl sm:rounded-full transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/80 text-[#0072EC] dark:text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+              <ShieldCheck className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div>
-              <h3 className="font-black text-sm sm:text-base text-slate-900">
+              <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
                 Goût Délicieux
               </h3>
-              <p className="text-xs text-slate-500 font-medium">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                 Un plaisir à chaque bouchée
               </p>
             </div>
           </div>
 
           {/* 2. Ingrédients de Qualité */}
-          <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-white/80 shadow-[0_8px_20px_rgba(0,114,236,0.12)] hover:shadow-lg transition-all duration-300 group">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-100 text-[#16A34A] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
-              <Leaf className="w-6 h-6" />
+          <div className="flex items-center gap-3.5 py-3 sm:py-2 px-3 sm:px-4 group hover:bg-emerald-50/50 dark:hover:bg-slate-800/60 rounded-2xl sm:rounded-full transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-[#16A34A] dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+              <Leaf className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div>
-              <h3 className="font-black text-sm sm:text-base text-slate-900">
+              <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
                 Ingrédients de Qualité
               </h3>
-              <p className="text-xs text-slate-500 font-medium">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                 Pour toute la famille
               </p>
             </div>
           </div>
 
           {/* 3. Plaisir Garanti */}
-          <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-white/80 shadow-[0_8px_20px_rgba(0,114,236,0.12)] hover:shadow-lg transition-all duration-300 group">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-100 text-[#F59E0B] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
-              <Smile className="w-6 h-6" />
+          <div className="flex items-center gap-3.5 py-3 sm:py-2 px-3 sm:px-4 group hover:bg-amber-50/50 dark:hover:bg-slate-800/60 rounded-2xl sm:rounded-full transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-[#F59E0B] dark:text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+              <Smile className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div>
-              <h3 className="font-black text-sm sm:text-base text-slate-900">
+              <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
                 Plaisir Garanti
               </h3>
-              <p className="text-xs text-slate-500 font-medium">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
                 Pour petits et grands
               </p>
             </div>
           </div>
 
           {/* 4. Marque de Confiance */}
-          <div className="flex items-center gap-3 p-3.5 sm:p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-white/80 shadow-[0_8px_20px_rgba(0,114,236,0.12)] hover:shadow-lg transition-all duration-300 group">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-100 text-[#0072EC] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
-              <Star className="w-6 h-6" />
+          <div className="flex items-center gap-3.5 py-3 sm:py-2 px-3 sm:px-4 group hover:bg-blue-50/50 dark:hover:bg-slate-800/60 rounded-2xl sm:rounded-full transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/80 text-[#0072EC] dark:text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+              <Star className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div>
-              <h3 className="font-black text-sm sm:text-base text-slate-900">
+              <h3 className="font-black text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
                 Marque de Confiance
               </h3>
-              <p className="text-xs text-slate-500 font-medium">
-                Depuis toujours en Côte d&apos;Ivoire
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                Depuis toujours
               </p>
             </div>
           </div>
-
         </div>
       </div>
     </section>
